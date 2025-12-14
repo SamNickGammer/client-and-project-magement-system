@@ -1,14 +1,21 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import React, { createContext, useContext, useEffect, useState } from "react"
 
 type Theme = "dark" | "light"
 
-export function useTheme() {
+interface ThemeContextType {
+    theme: Theme
+    toggleTheme: () => void
+}
+
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
+
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const [theme, setTheme] = useState<Theme>(() => {
-        if (typeof window !== "undefined") {
-            const savedTheme = localStorage.getItem("theme") as Theme | null
-            return savedTheme || "dark"
+        if (typeof globalThis.window !== "undefined") {
+            const saved = localStorage.getItem("theme") as Theme | null
+            return saved || "dark"
         }
         return "dark"
     })
@@ -24,9 +31,22 @@ export function useTheme() {
     }, [theme])
 
     const toggleTheme = () => {
-        const newTheme = theme === "dark" ? "light" : "dark"
-        setTheme(newTheme)
+        setTheme((prev) => (prev === "dark" ? "light" : "dark"))
     }
 
-    return { theme, toggleTheme }
+    const value = React.useMemo(() => ({ theme, toggleTheme }), [theme]);
+
+    return (
+        <ThemeContext.Provider value={value}>
+            {children}
+        </ThemeContext.Provider>
+    )
+}
+
+export function useTheme() {
+    const context = useContext(ThemeContext)
+    if (context === undefined) {
+        throw new Error("useTheme must be used within a ThemeProvider")
+    }
+    return context
 }
