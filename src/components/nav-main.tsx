@@ -11,7 +11,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 
 export function NavMain({
   items,
@@ -23,6 +23,7 @@ export function NavMain({
   }[]
 }) {
   const router = useRouter()
+  const pathname = usePathname()
   const { toggleSidebar } = useSidebar()
 
   const handleMenuItemClick = (url: string) => {
@@ -47,8 +48,8 @@ export function NavMain({
         </SidebarMenu>
         <SidebarMenu>
           {items.map((item) => (
-            <SidebarMenuItem key={item.title} onClick={() => handleMenuItemClick(item.url)}>
-              <SidebarMenuButton tooltip={item.title}>
+            <SidebarMenuItem key={item.title} onClick={() => handleMenuItemClick(item.url)} >
+              <SidebarMenuButton tooltip={item.title} isActive={pathname === item.url}>
                 {item.icon && <item.icon />}
                 <span>{item.title}</span>
               </SidebarMenuButton>
