@@ -47,7 +47,7 @@ export function LoginForm({
       }
 
       toast.success("Login successful")
-      router.push("/dashboard")
+      router.push("/")
       router.refresh() // Refresh to update middleware state
     } catch (error) {
       if (error instanceof Error) {
