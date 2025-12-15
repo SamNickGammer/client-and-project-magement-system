@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Zalando_Sans_Expanded } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/utils/frontend/hooks/useTheme";
 import ReduxProvider from "@/utils/frontend/store/provider";
@@ -11,11 +11,6 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const zalandoSansExpanded = Zalando_Sans_Expanded({
-  variable: "--font-zalando-sans-expanded",
   subsets: ["latin"],
 });
 
@@ -60,7 +55,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${zalandoSansExpanded.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider>
           <ReduxProvider>

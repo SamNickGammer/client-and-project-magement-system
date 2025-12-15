@@ -72,7 +72,16 @@ export async function POST(req: Request) {
         });
 
         return NextResponse.json({
-            user: { id: user.id, email: user.email },
+            user: {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                accessLevel: user.accessLevel,
+                image: user.image,
+                phone: user.phone,
+                status: user.status,
+                createdAt: user.createdAt.toISOString(),
+            },
             message: "Login successful",
         });
     } catch (error) {

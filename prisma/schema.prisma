@@ -14,12 +14,24 @@ datasource db {
   provider = "postgresql"
 }
 
+enum AccessLevel {
+  DIRECTOR
+  HR
+  DEVELOPER
+  MARKETING
+}
+
 model User {
-  id                 String    @id @default(uuid())
-  email              String    @unique
+  id                 String       @id @default(uuid())
+  email              String       @unique
   password           String
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+  name               String?
+  accessLevel        AccessLevel?
+  image              String?
+  phone              String?
+  status             String?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
   lastLoginAt        DateTime?
   currentTokenExpiry DateTime?
 }
