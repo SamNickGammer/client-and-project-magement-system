@@ -19,6 +19,8 @@ import { Input } from "@/components/ui/input"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { useAppDispatch } from "@/utils/frontend/store/hooks"
+import { login } from "@/utils/frontend/store/features/userSlice"
 
 export function LoginForm({
   className,
@@ -28,6 +30,7 @@ export function LoginForm({
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const dispatch = useAppDispatch()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -45,6 +48,7 @@ export function LoginForm({
       if (!res.ok) {
         throw new Error(data.error || "Login failed")
       }
+      dispatch(login({ user: data.user }))
 
       toast.success("Login successful")
 

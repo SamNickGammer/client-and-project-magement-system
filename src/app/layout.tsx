@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Zalando_Sans_Expanded } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/utils/frontend/hooks/useTheme";
+import ReduxProvider from "@/utils/frontend/store/provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -62,7 +63,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${zalandoSansExpanded.variable} antialiased`}
       >
         <ThemeProvider>
-          {children}
+          <ReduxProvider>
+            {children}
+          </ReduxProvider>
         </ThemeProvider>
       </body>
     </html>

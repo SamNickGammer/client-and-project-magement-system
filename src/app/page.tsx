@@ -1,10 +1,12 @@
 "use client"
 
+import { useAppSelector } from "@/utils/frontend/store/hooks";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
   const router = useRouter();
+  const user = useAppSelector((state) => state.user.userInfo);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
@@ -20,7 +22,7 @@ export default function Home() {
           />
           <div className="text-4xl">
             Welcome, {' '}
-            <span className="font-bold bg-white rounded-[10px] px-2 text-black p-[5px_10px]">Om Prakash Bharati</span>
+            <span className="font-bold bg-white rounded-[10px] px-2 text-black p-[5px_10px]">{user?.email || 'User'}</span>
           </div>
         </div>
         <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
