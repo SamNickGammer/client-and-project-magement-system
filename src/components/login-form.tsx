@@ -47,7 +47,13 @@ export function LoginForm({
       }
 
       toast.success("Login successful")
-      router.push("/")
+
+      const skipHome = localStorage.getItem("skipHome")
+      if (skipHome === "true") {
+        router.push("/dashboard")
+      } else {
+        router.push("/")
+      }
       router.refresh() // Refresh to update middleware state
     } catch (error) {
       if (error instanceof Error) {
