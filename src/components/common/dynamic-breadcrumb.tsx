@@ -11,6 +11,10 @@ import {
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 
+const titleMapper: Record<string, string> = {
+    crm: "CRM",
+}
+
 export function DynamicBreadcrumb() {
     const pathname = usePathname()
     const paths = pathname === "/" ? [] : pathname.split("/").filter((item) => item !== "")
@@ -25,7 +29,7 @@ export function DynamicBreadcrumb() {
                 {paths.map((item, index) => {
                     const href = `/${paths.slice(0, index + 1).join("/")}`
                     const isLast = index === paths.length - 1
-                    const title = item.charAt(0).toUpperCase() + item.slice(1)
+                    const title = titleMapper[item] || item.charAt(0).toUpperCase() + item.slice(1)
 
                     return (
                         <React.Fragment key={href}>

@@ -15,8 +15,8 @@ import {
 export const SIDEBAR_DATA = {
     navMain: [
         {
-            title: "Lifecycle",
-            url: "/dashboard/lifecycle",
+            title: "CRM",
+            url: "/dashboard/crm",
             icon: IconListDetails,
         },
         {
