@@ -21,6 +21,20 @@ enum AccessLevel {
   MARKETING
 }
 
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  CONVERTED
+  LOST
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
 model User {
   id                 String       @id @default(uuid())
   email              String       @unique
@@ -34,4 +48,145 @@ model User {
   updatedAt          DateTime     @updatedAt
   lastLoginAt        DateTime?
   currentTokenExpiry DateTime?
+
+
+}
+
+model Employee {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  phone     String?
+  position  String?
+  image     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  assignedLeads      Lead[]
+  assignedProjects   ProjectAssignment[]
+  assignedTasks      TaskAssignment[]
+}
+
+model Contact {
+  id          String    @id @default(uuid())
+  name        String
+  email       String?
+  phone       String?
+  company     String?
+  position    String?
+  notes       String?
+  image       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Many-to-many
+  leads       LeadContact[]
+  clients     ClientContact[]
+}
+
+model Lead {
+  id          String     @id @default(uuid())
+  title       String
+  description String?
+  status      LeadStatus @default(NEW)
+  value       Float?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relationships
+  assignedTo   Employee? @relation(fields: [assignedToId], references: [id])
+  assignedToId String?
+  contacts     LeadContact[]
+  client       Client?
+}
+
+model Client {
+  id          String    @id @default(uuid())
+  name        String
+  company     String?
+  status      String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relationships
+  leadId      String?   @unique
+  lead        Lead?     @relation(fields: [leadId], references: [id])
+  contacts    ClientContact[]
+  projects    Project[]
+}
+
+model Project {
+  id          String    @id @default(uuid())
+  title       String
+  description String?
+  startDate   DateTime?
+  endDate     DateTime?
+  budget      Float?
+  status      String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relationships
+  client      Client    @relation(fields: [clientId], references: [id])
+  clientId    String
+  tasks       Task[]
+  assignments ProjectAssignment[]
+}
+
+model Task {
+  id          String     @id @default(uuid())
+  title       String
+  description String?
+  dueDate     DateTime?
+  status      TaskStatus @default(TODO)
+  priority    String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relationships
+  project     Project    @relation(fields: [projectId], references: [id])
+  projectId   String
+  assignments TaskAssignment[]
+}
+
+// Many-to-Many Junction Tables
+model LeadContact {
+  leadId     String
+  contactId  String
+
+  lead       Lead     @relation(fields: [leadId], references: [id])
+  contact    Contact  @relation(fields: [contactId], references: [id])
+
+  @@id([leadId, contactId])
+}
+
+model ClientContact {
+  clientId   String
+  contactId  String
+
+  client     Client   @relation(fields: [clientId], references: [id])
+  contact    Contact  @relation(fields: [contactId], references: [id])
+
+  @@id([clientId, contactId])
+}
+
+model ProjectAssignment {
+  projectId  String
+  employeeId String
+
+  project    Project  @relation(fields: [projectId], references: [id])
+  employee   Employee @relation(fields: [employeeId], references: [id])
+
+  @@id([projectId, employeeId])
+}
+
+model TaskAssignment {
+  taskId     String
+  employeeId String
+
+  task       Task     @relation(fields: [taskId], references: [id])
+  employee   Employee @relation(fields: [employeeId], references: [id])
+
+  @@id([taskId, employeeId])
 }

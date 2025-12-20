@@ -8,6 +8,10 @@ export const CRMNavigationItems: { title: string; href: string }[] = [
         href: "/dashboard/crm/leads",
     },
     {
+        title: "Clients",
+        href: "/dashboard/crm/clients",
+    },
+    {
         title: "Contact",
         href: "/dashboard/crm/contact",
     },
