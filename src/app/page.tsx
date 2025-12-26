@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAppDispatch, useAppSelector } from "@/utils/frontend/store/hooks";
@@ -24,16 +24,21 @@ export default function Home() {
             priority
           />
           <div className="lg:text-4xl sm:text-xl md:text-2xl md:flex md:gap-3 sm:items-center sm:gap-2 sm:text-start text-center">
-            Welcome, {' '}
+            Welcome,{" "}
             <span className="font-bold bg-white rounded-[10px] px-2 text-black p-[5px_10px] flex items-center gap-2 mt-2 sm:mt-0">
               <Avatar>
-                <AvatarImage src={user?.image || "/assets/logos/logo_dark.svg"} alt="@shadcn" />
-                <AvatarFallback>{user?.name?.[0] || user?.email?.[0] || 'User'}</AvatarFallback>
+                <AvatarImage
+                  src={user?.image || "/assets/logos/logo_dark.svg"}
+                  alt="@shadcn"
+                />
+                <AvatarFallback>
+                  {user?.name?.[0] || user?.email?.[0] || "User"}
+                </AvatarFallback>
               </Avatar>
-              {user?.name || user?.email || 'User'}
+              {user?.name || user?.email || "User"}
             </span>
           </div>
-        </div >
+        </div>
         <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
           <button
             onClick={() => {
@@ -53,11 +58,12 @@ export default function Home() {
           </button>
           <button
             onClick={() => handleLogout(dispatch, router)}
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-red-600 text-red-600 px-5 transition-colors hover:border-transparent dark:border-red-700 dark:text-red-500 md:w-[115px] cursor-pointer">
+            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-red-600 text-red-600 px-5 transition-colors hover:border-transparent dark:border-red-700 dark:text-red-500 md:w-[115px] cursor-pointer"
+          >
             Logout
           </button>
         </div>
-      </main >
-    </div >
+      </main>
+    </div>
   );
 }

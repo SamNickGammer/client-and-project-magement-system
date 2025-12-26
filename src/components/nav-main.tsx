@@ -1,8 +1,6 @@
-"use client"
+"use client";
 
-import { IconDashboardFilled, IconMail, type Icon } from "@tabler/icons-react"
-
-import { Button } from "@/components/ui/button"
+import { IconDashboardFilled, type Icon } from "@tabler/icons-react";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -10,26 +8,26 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar"
-import { usePathname, useRouter } from "next/navigation"
+} from "@/components/ui/sidebar";
+import { usePathname, useRouter } from "next/navigation";
 
 export function NavMain({
   items,
 }: {
   items: {
-    title: string
-    url: string
-    icon?: Icon
-  }[]
+    title: string;
+    url: string;
+    icon?: Icon;
+  }[];
 }) {
-  const router = useRouter()
-  const pathname = usePathname()
-  const { toggleSidebar } = useSidebar()
+  const router = useRouter();
+  const pathname = usePathname();
+  const { toggleSidebar } = useSidebar();
 
   const handleMenuItemClick = (url: string) => {
-    router.push(url)
-    toggleSidebar()
-  }
+    router.push(url);
+    toggleSidebar();
+  };
 
   return (
     <SidebarGroup>
@@ -48,8 +46,14 @@ export function NavMain({
         </SidebarMenu>
         <SidebarMenu>
           {items.map((item) => (
-            <SidebarMenuItem key={item.title} onClick={() => handleMenuItemClick(item.url)} >
-              <SidebarMenuButton tooltip={item.title} isActive={pathname.startsWith(item.url)}>
+            <SidebarMenuItem
+              key={item.title}
+              onClick={() => handleMenuItemClick(item.url)}
+            >
+              <SidebarMenuButton
+                tooltip={item.title}
+                isActive={pathname.startsWith(item.url)}
+              >
                 {item.icon && <item.icon />}
                 <span>{item.title}</span>
               </SidebarMenuButton>
@@ -58,5 +62,5 @@ export function NavMain({
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
-  )
+  );
 }

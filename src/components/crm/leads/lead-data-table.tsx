@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -12,7 +12,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table"
+} from "@tanstack/react-table";
 
 import {
   Table,
@@ -21,41 +21,43 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { ChevronDown } from "lucide-react"
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
+import { Lead } from "./lead-columns";
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
 }
 
 export function LeadDataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = React.useState<SortingState>([])
+  const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  )
+    [],
+  );
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = React.useState({})
-  const [showActiveOnly, setShowActiveOnly] = React.useState(false)
+    React.useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = React.useState({});
+  const [showActiveOnly, setShowActiveOnly] = React.useState(false);
 
   // Memoize data ref to allow internal filtering
   const tableData = React.useMemo(() => {
     if (!showActiveOnly) return data;
-    return data.filter((item: any) => item.status !== 'CONVERTED');
+    return data.filter((item) => (item as Lead).status !== "CONVERTED");
   }, [data, showActiveOnly]);
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: tableData,
     columns,
@@ -73,7 +75,7 @@ export function LeadDataTable<TData, TValue>({
       columnVisibility,
       rowSelection,
     },
-  })
+  });
 
   return (
     <div className="w-full">
@@ -86,11 +88,11 @@ export function LeadDataTable<TData, TValue>({
           }
           className="max-w-sm"
         />
-        <Button 
-            variant={showActiveOnly ? "default" : "outline"}
-            onClick={() => setShowActiveOnly(!showActiveOnly)}
+        <Button
+          variant={showActiveOnly ? "default" : "outline"}
+          onClick={() => setShowActiveOnly(!showActiveOnly)}
         >
-            {showActiveOnly ? "Show All" : "Hide Converted"}
+          {showActiveOnly ? "Show All" : "Hide Converted"}
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -114,7 +116,7 @@ export function LeadDataTable<TData, TValue>({
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
-                )
+                );
               })}
           </DropdownMenuContent>
         </DropdownMenu>
@@ -131,10 +133,10 @@ export function LeadDataTable<TData, TValue>({
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -142,23 +144,27 @@ export function LeadDataTable<TData, TValue>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => {
-                  const status = (row.original as any).status;
-                  return (
-                    <TableRow
+                const status = (row.original as Lead).status;
+                return (
+                  <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    className={status === 'CONVERTED' ? 'bg-green-50 hover:bg-green-100 dark:bg-green-900/20 dark:hover:bg-green-900/30' : ''}
-                    >
+                    className={
+                      status === "CONVERTED"
+                        ? "bg-green-50 hover:bg-green-100 dark:bg-green-900/20 dark:hover:bg-green-900/30"
+                        : ""
+                    }
+                  >
                     {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
+                      <TableCell key={cell.id}>
                         {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
                         )}
-                        </TableCell>
+                      </TableCell>
                     ))}
-                    </TableRow>
-                )
+                  </TableRow>
+                );
               })
             ) : (
               <TableRow>
@@ -198,5 +204,5 @@ export function LeadDataTable<TData, TValue>({
         </div>
       </div>
     </div>
-  )
+  );
 }

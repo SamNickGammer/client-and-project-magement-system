@@ -1,25 +1,28 @@
-import { Separator } from "@/components/ui/separator"
-import { SidebarTrigger } from "@/components/ui/sidebar"
-import { ThemeToggle } from "@/components/common/theme-toggle"
+import { Separator } from "@/components/ui/separator";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import { ThemeToggle } from "@/components/common/theme-toggle";
 
-import { DynamicBreadcrumb } from "@/components/common/dynamic-breadcrumb"
-import { cookies } from "next/headers"
-import { jwtVerify } from "jose"
-import { SessionTimer } from "@/components/common/session-timer"
+import { DynamicBreadcrumb } from "@/components/common/dynamic-breadcrumb";
+import { cookies } from "next/headers";
+import { jwtVerify } from "jose";
+import { SessionTimer } from "@/components/common/session-timer";
 
-const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key-change-this-in-env";
+const JWT_SECRET =
+  process.env.JWT_SECRET || "your-secret-key-change-this-in-env";
 
 export async function SiteHeader() {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("token")?.value
-  let expiry = 0
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
+  let expiry = 0;
 
   if (token) {
     try {
-      const secret = new TextEncoder().encode(JWT_SECRET)
-      const { payload } = await jwtVerify(token, secret)
-      expiry = (payload.exp as number) * 1000
-    } catch { }
+      const secret = new TextEncoder().encode(JWT_SECRET);
+      const { payload } = await jwtVerify(token, secret);
+      expiry = (payload.exp as number) * 1000;
+    } catch {
+      // Ignore invalid tokens
+    }
   }
 
   return (
@@ -37,5 +40,5 @@ export async function SiteHeader() {
         </div>
       </div>
     </header>
-  )
+  );
 }
