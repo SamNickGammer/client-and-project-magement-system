@@ -17,11 +17,12 @@ export default function Home() {
         <div className="flex items-center gap-12 flex-col sm:items-start">
           <Image
             className="dark:invert"
-            src="/assets/logos/logo_dark.svg"
+            src={"/assets/logos/logo_dark.svg"}
             alt="ScorpTech logo"
             width={150}
             height={150}
             priority
+            unoptimized
           />
           <div className="lg:text-4xl sm:text-xl md:text-2xl md:flex md:gap-3 sm:items-center sm:gap-2 sm:text-start text-center">
             Welcome,{" "}
@@ -53,6 +54,7 @@ export default function Home() {
               alt="ScorpTech logo"
               width={32}
               height={32}
+              unoptimized
             />
             Go to Dashboard
           </button>
