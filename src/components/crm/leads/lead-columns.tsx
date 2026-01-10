@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { ColumnDef } from "@tanstack/react-table";
 import {
   ArrowUpDown,
@@ -21,20 +23,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { Contact } from "../contacts/contact-columns";
+import { Lead } from "@/utils/dto/lead";
 
 // Define types based on API response
-export type Lead = {
-  id: string;
-  title: string;
-  description: string | null;
-  status: "NEW" | "CONTACTED" | "QUALIFIED" | "CONVERTED" | "LOST";
-  value: number | null;
-  assignedToId: string | null;
-  assignedTo?: { name: string } | null;
-  contacts: { contact: Contact }[];
-  createdAt: string;
-};
 
 interface LeadColumnsProps {
   onEdit: (lead: Lead) => void;
@@ -83,7 +74,12 @@ export const getLeadColumns = ({
       );
     },
     cell: ({ row }) => (
-      <div className="font-medium">{row.getValue("title")}</div>
+      <Link
+        href={`/dashboard/crm/leads/${row.original.id}`}
+        className="font-medium hover:underline text-primary"
+      >
+        {row.getValue("title")}
+      </Link>
     ),
   },
   {
@@ -127,7 +123,7 @@ export const getLeadColumns = ({
       const lead = row.original;
       return (
         <div className="flex -space-x-2">
-          {lead.contacts.slice(0, 3).map((c) => (
+          {lead?.contacts?.slice(0, 3).map((c) => (
             <div
               key={c.contact.id}
               title={c.contact.name}
@@ -145,9 +141,9 @@ export const getLeadColumns = ({
               )}
             </div>
           ))}
-          {lead.contacts.length > 3 && (
+          {(lead.contacts?.length ?? 0) > 3 && (
             <div className="h-6 w-6 rounded-full bg-muted border-2 border-background flex items-center justify-center text-[10px]">
-              +{lead.contacts.length - 3}
+              +{(lead.contacts?.length ?? 0) - 3}
             </div>
           )}
         </div>

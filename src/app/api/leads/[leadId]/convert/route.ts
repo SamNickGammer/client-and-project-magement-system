@@ -3,14 +3,14 @@ import { prisma } from "@/utils/prisma";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ leadId: string }> },
 ) {
   try {
-    const { id } = await params;
+    const { leadId } = await params;
 
     // Fetch the lead with its contacts
     const lead = await prisma.lead.findUnique({
-      where: { id },
+      where: { id: leadId },
       include: { contacts: true },
     });
 
@@ -29,7 +29,7 @@ export async function POST(
     const client = await prisma.$transaction(async (tx) => {
       // 1. Update Lead Status
       await tx.lead.update({
-        where: { id },
+        where: { id: leadId },
         data: { status: "CONVERTED" },
       });
 
@@ -39,7 +39,7 @@ export async function POST(
           name: lead.title, // or use specific logic if lead title isn't suitable
           // copy value? company? - Currently Client schema has limited fields, basic copy
           status: "Active",
-          leadId: id,
+          leadId: leadId,
         },
       });
 

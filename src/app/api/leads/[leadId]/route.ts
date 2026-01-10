@@ -11,20 +11,29 @@ const leadSchema = z.object({
   value: z.number().optional(),
   assignedToId: z.string().optional().nullable(),
   contactIds: z.array(z.string()).optional(),
+  tags: z.array(z.string()).optional(),
+  chatHistory: z.array(z.any()).optional(), // Allow JSON updates
 });
+
+const updateLeadSchema = leadSchema.partial();
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ leadId: string }> },
 ) {
   try {
-    const { id } = await params;
+    const { leadId } = await params;
     const lead = await prisma.lead.findUnique({
-      where: { id },
+      where: { id: leadId },
       include: {
         assignedTo: true,
-        contacts: { include: { contact: true } },
+        contacts: {
+          include: {
+            contact: true,
+          },
+        },
         client: true,
+        attachments: true,
       },
     });
 
@@ -44,11 +53,12 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ leadId: string }> },
 ) {
   try {
-    const { id } = await params;
+    const { leadId } = await params;
     const body = await req.json();
+    // PUT usually implies full replacement or at least strictly validated structure
     const result = leadSchema.safeParse(body);
 
     if (!result.success) {
@@ -64,7 +74,7 @@ export async function PUT(
     const updatedLead = await prisma.$transaction(async (tx) => {
       // 1. Update basic fields
       await tx.lead.update({
-        where: { id },
+        where: { id: leadId },
         data: { ...leadData },
       });
 
@@ -72,13 +82,13 @@ export async function PUT(
       if (contactIds) {
         // Delete existing relations
         await tx.leadContact.deleteMany({
-          where: { leadId: id },
+          where: { leadId: leadId },
         });
         // Create new relations
         if (contactIds.length > 0) {
           await tx.leadContact.createMany({
             data: contactIds.map((contactId) => ({
-              leadId: id,
+              leadId: leadId,
               contactId,
             })),
           });
@@ -86,10 +96,11 @@ export async function PUT(
       }
 
       return tx.lead.findUnique({
-        where: { id },
+        where: { id: leadId },
         include: {
           assignedTo: true,
           contacts: { include: { contact: true } },
+          attachments: true,
         },
       });
     });
@@ -104,14 +115,50 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
+export async function PATCH(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ leadId: string }> },
 ) {
   try {
-    const { id } = await params;
+    const { leadId } = await params;
+    const body = await req.json();
+    const result = updateLeadSchema.safeParse(body);
+
+    if (!result.success) {
+      return NextResponse.json(
+        { error: result.error.flatten() },
+        { status: 400 },
+      );
+    }
+
+    const lead = await prisma.lead.update({
+      where: { id: leadId },
+      data: result.data,
+      include: {
+        assignedTo: true,
+        contacts: { include: { contact: true } },
+        attachments: true,
+      },
+    });
+
+    return NextResponse.json(lead);
+  } catch (error) {
+    console.error("Error updating lead:", error);
+    return NextResponse.json(
+      { error: "Failed to update lead" },
+      { status: 500 },
+    );
+  }
+}
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ leadId: string }> },
+) {
+  try {
+    const { leadId } = await params;
     await prisma.lead.delete({
-      where: { id },
+      where: { id: leadId },
     });
 
     return NextResponse.json({ message: "Lead deleted successfully" });

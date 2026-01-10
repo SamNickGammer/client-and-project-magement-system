@@ -99,6 +99,36 @@ model Lead {
   assignedToId String?
   contacts     LeadContact[]
   client       Client?
+  
+  // New fields
+  tags         String[]
+  chatHistory  Json?     @default("[]")
+  attachments  LeadAttachment[]
+  checklists   LeadChecklist[]
+}
+
+model LeadChecklist {
+  id        String   @id @default(uuid())
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id])
+  
+  items     ChecklistItem[]
+}
+
+model ChecklistItem {
+  id          String   @id @default(uuid())
+  title       String
+  isCompleted Boolean  @default(false)
+  priority    String?  // "low", "medium", "high"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  checklistId String
+  checklist   LeadChecklist @relation(fields: [checklistId], references: [id])
 }
 
 model Client {
@@ -189,4 +219,18 @@ model TaskAssignment {
   employee   Employee @relation(fields: [employeeId], references: [id])
 
   @@id([taskId, employeeId])
+}
+
+model LeadAttachment {
+  id          String   @id @default(uuid())
+  name        String
+  url         String
+  size        Int
+  type        String
+  createdAt   DateTime @default(now())
+  
+  uploadedBy  String?  // Can link to User/Employee ID if needed, keeping simple for now
+  
+  leadId      String
+  lead        Lead     @relation(fields: [leadId], references: [id])
 }

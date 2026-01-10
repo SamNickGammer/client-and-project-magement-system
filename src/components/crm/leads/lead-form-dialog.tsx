@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Lead } from "./lead-columns";
+import { Lead } from "@/utils/dto/lead";
 import { Contact } from "@/components/crm/contacts/contact-columns";
 import { useEffect, useState } from "react";
 import { MultiSelect, Option } from "@/components/ui/multi-select";
@@ -88,7 +88,7 @@ export function LeadFormDialog({
       setStatus(lead.status);
       setValue(lead.value ? lead.value.toString() : "");
       setAssignedToId(lead.assignedToId || "");
-      setSelectedContactIds(lead.contacts.map((c) => c.contact.id));
+      setSelectedContactIds(lead?.contacts?.map((c) => c.contact.id) || []);
     } else {
       // Reset
       setTitle("");

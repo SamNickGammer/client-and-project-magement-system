@@ -31,7 +31,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
-import { Lead } from "./lead-columns";
+import { Lead } from "@/utils/dto/lead";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];

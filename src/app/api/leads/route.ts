@@ -11,6 +11,8 @@ const leadSchema = z.object({
   value: z.number().optional(),
   assignedToId: z.string().optional(), // Employee ID
   contactIds: z.array(z.string()).optional(), // List of Contact IDs
+  tags: z.array(z.string()).optional(),
+  chatHistory: z.array(z.any()).optional(),
 });
 
 export async function GET() {
@@ -25,13 +27,18 @@ export async function GET() {
           },
         },
         client: true,
+        attachments: true,
       },
     });
     return NextResponse.json(leads);
   } catch (error) {
     console.error("Error fetching leads:", error);
+    if (error instanceof Error) {
+      console.error("Stack:", error.stack);
+      console.error("Message:", error.message);
+    }
     return NextResponse.json(
-      { error: "Failed to fetch leads" },
+      { error: "Failed to fetch leads", details: String(error) },
       { status: 500 },
     );
   }
@@ -54,6 +61,8 @@ export async function POST(req: NextRequest) {
     const newLead = await prisma.lead.create({
       data: {
         ...leadData,
+        tags: leadData.tags || [],
+        chatHistory: leadData.chatHistory || [],
         contacts:
           contactIds && contactIds.length > 0
             ? {
@@ -66,6 +75,7 @@ export async function POST(req: NextRequest) {
       include: {
         assignedTo: true,
         contacts: { include: { contact: true } },
+        attachments: true,
       },
     });
 

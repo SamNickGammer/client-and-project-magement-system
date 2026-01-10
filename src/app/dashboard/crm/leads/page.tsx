@@ -6,10 +6,11 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Lead, getLeadColumns } from "@/components/crm/leads/lead-columns";
+import { getLeadColumns } from "@/components/crm/leads/lead-columns";
 import { LeadDataTable } from "@/components/crm/leads/lead-data-table";
 import { LeadCard } from "@/components/crm/leads/lead-card";
 import { LeadFormDialog } from "@/components/crm/leads/lead-form-dialog";
+import { Lead } from "@/utils/dto/lead";
 
 export default function LeadsPage() {
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
