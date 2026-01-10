@@ -49,7 +49,7 @@ export function LeadDataTable<TData, TValue>({
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-  const [showActiveOnly, setShowActiveOnly] = React.useState(false);
+  const [showActiveOnly, setShowActiveOnly] = React.useState(true);
 
   // Memoize data ref to allow internal filtering
   const tableData = React.useMemo(() => {
