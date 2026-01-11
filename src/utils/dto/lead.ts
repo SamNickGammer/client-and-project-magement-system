@@ -67,5 +67,15 @@ export interface Lead {
     id: string;
     title: string;
     status: string | null;
+    startDate: string | null;
+    endDate: string | null;
+    tasks: { status: string }[];
+    assignments: {
+      employee: {
+        id: string;
+        name: string;
+        image: string | null;
+      };
+    }[];
   }[];
 }

@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/utils/prisma";
 import { z } from "zod";
+import { LeadStatus } from "@/generated/prisma";
 
 const clientSchema = z.object({
   title: z.string().min(1, "Title is required"),
   company: z.string().optional(),
-  status: z.string().optional(),
+  status: z.nativeEnum(LeadStatus).optional(),
 });
 
 export async function GET(
@@ -18,7 +19,12 @@ export async function GET(
       where: { id },
       include: {
         contacts: { include: { contact: true } },
-        projects: true,
+        projects: {
+          include: {
+            tasks: { select: { status: true } },
+            assignments: { include: { employee: true } },
+          },
+        },
       },
     });
 
@@ -57,7 +63,7 @@ export async function PUT(
       data: {
         title: result.data.title,
         company: result.data.company,
-        status: result.data.status as any, // Cast status if needed or ensure validation matches
+        status: result.data.status,
       },
     });
 

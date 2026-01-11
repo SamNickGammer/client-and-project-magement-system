@@ -162,16 +162,8 @@ export default function LeadDetailsPage() {
 
               <div className="space-y-3">
                 <div className="flex justify-between py-1 border-b border-dashed">
-                  <span className="text-muted-foreground">Client Name</span>
-                  <span className="font-medium">
-                    {lead.client?.name || "N/A"}
-                  </span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-dashed">
                   <span className="text-muted-foreground">Company</span>
-                  <span className="font-medium">
-                    {lead.client?.company || "N/A"}
-                  </span>
+                  <span className="font-medium">{lead.company || "N/A"}</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-dashed">
                   <span className="text-muted-foreground">Value</span>

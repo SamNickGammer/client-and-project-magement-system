@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -17,146 +16,180 @@ import {
 } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Lead } from "@/utils/dto/lead";
 
-// Mock data until specific project schema/api is confirmed fully working
-// In real app, this would be fetched via React Query based on clientId
-interface ProjectStats {
-  id: string;
-  title: string;
-  totalTasks: number;
-  completedTasks: number;
-  pendingTasks: number;
-  onHoldTasks: number;
-  status: string;
-  dueDate: string;
+interface ClientProjectsTabProps {
+  leadId: string;
+  projects?: Lead["projects"];
 }
 
-export function ClientProjectsTab({ leadId }: { leadId: string }) {
-  const [projects, setProjects] = useState<ProjectStats[]>([]);
-
-  useEffect(() => {
-    // Simulate fetch - replace with real API call later
-    const timer = setTimeout(() => {
-      setProjects([
-        {
-          id: "1",
-          title: "Website Redesign",
-          totalTasks: 12,
-          completedTasks: 5,
-          pendingTasks: 5,
-          onHoldTasks: 2,
-          status: "In Progress",
-          dueDate: "2024-12-31",
-        },
-        {
-          id: "2",
-          title: "Mobile App Phase 1",
-          totalTasks: 45,
-          completedTasks: 20,
-          pendingTasks: 25,
-          onHoldTasks: 0,
-          status: "Active",
-          dueDate: "2025-03-15",
-        },
-      ]);
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [leadId]);
+export function ClientProjectsTab({ projects = [] }: ClientProjectsTabProps) {
+  if (!projects || projects.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-40 text-muted-foreground bg-muted/5 rounded-lg border border-dashed">
+        <p>No projects found for this client.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="h-[600px] flex flex-col gap-4">
       <ScrollArea className="h-full">
         <div className="grid grid-cols-1 gap-4 p-1">
-          {projects.map((project) => (
-            <Card
-              key={project.id}
-              className="hover:shadow-md transition-shadow"
-            >
-              <CardHeader className="pb-2">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <CardTitle className="text-lg">{project.title}</CardTitle>
-                    <CardDescription>
-                      Due: {format(new Date(project.dueDate), "MMM dd, yyyy")}
-                    </CardDescription>
+          {projects.map((project) => {
+            // Calculate task stats
+            const totalTasks = project.tasks.length;
+            const completedTasks = project.tasks.filter(
+              (t) => t.status === "COMPLETED" || t.status === "DONE",
+            ).length;
+            const pendingTasks = project.tasks.filter(
+              (t) => t.status === "TODO" || t.status === "IN_PROGRESS",
+            ).length;
+            const onHoldTasks = project.tasks.filter(
+              (t) => t.status === "ON_HOLD",
+            ).length; // Adjust status string as needed based on Enum
+
+            return (
+              <Card
+                key={project.id}
+                className="hover:shadow-md transition-shadow gap-2"
+              >
+                <CardHeader>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <CardTitle className="text-lg">{project.title}</CardTitle>
+                      <CardDescription>
+                        {project.startDate
+                          ? format(new Date(project.startDate), "MMM dd, yyyy")
+                          : "Start TBD"}{" "}
+                        -{" "}
+                        {project.endDate
+                          ? format(new Date(project.endDate), "MMM dd, yyyy")
+                          : "End TBD"}
+                      </CardDescription>
+                    </div>
+                    <Badge variant="outline">
+                      {project.status || "Active"}
+                    </Badge>
                   </div>
-                  <Badge variant="outline">{project.status}</Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-4 mt-2">
-                  <div className="text-sm font-medium mr-2">
-                    Tasks Breakdown:
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between mt-2 flex-wrap gap-4">
+                    {/* Task Breakdown */}
+                    <div className="flex items-center gap-4">
+                      <div className="text-sm font-medium mr-2">
+                        Tasks Breakdown:
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <div className="flex items-center gap-1 cursor-help">
+                                <div className="w-3 h-3 rounded-full bg-blue-500" />
+                                <span className="text-sm text-muted-foreground">
+                                  {totalTasks}
+                                </span>
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Total Tasks</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <div className="flex items-center gap-1 cursor-help">
+                                <div className="w-3 h-3 rounded-full bg-green-500" />
+                                <span className="text-sm text-muted-foreground">
+                                  {completedTasks}
+                                </span>
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Completed Tasks</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <div className="flex items-center gap-1 cursor-help">
+                                <div className="w-3 h-3 rounded-full bg-gray-400 dark:bg-gray-600" />
+                                <span className="text-sm text-muted-foreground">
+                                  {pendingTasks}
+                                </span>
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Pending Tasks</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+
+                        {onHoldTasks > 0 && (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <div className="flex items-center gap-1 cursor-help">
+                                  <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                                  <span className="text-sm text-muted-foreground">
+                                    {onHoldTasks}
+                                  </span>
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>On Hold Tasks</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Assignments */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground">
+                        Team:
+                      </span>
+                      <div className="flex -space-x-2">
+                        {project.assignments &&
+                        project.assignments.length > 0 ? (
+                          project.assignments.map((assign, idx) => (
+                            <TooltipProvider key={idx}>
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <Avatar className="h-8 w-8 border-2 border-background">
+                                    <AvatarImage
+                                      src={assign.employee?.image || ""}
+                                    />
+                                    <AvatarFallback>
+                                      {assign.employee?.name?.[0] || "?"}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>{assign.employee?.name}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          ))
+                        ) : (
+                          <span className="text-sm text-muted-foreground italic">
+                            No team assigned
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   </div>
-
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <div className="flex items-center gap-1 cursor-help">
-                          <div className="w-3 h-3 rounded-full bg-blue-500" />
-                          <span className="text-sm text-muted-foreground">
-                            {project.totalTasks}
-                          </span>
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Total Tasks</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <div className="flex items-center gap-1 cursor-help">
-                          <div className="w-3 h-3 rounded-full bg-green-500" />
-                          <span className="text-sm text-muted-foreground">
-                            {project.completedTasks}
-                          </span>
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Completed Tasks</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <div className="flex items-center gap-1 cursor-help">
-                          <div className="w-3 h-3 rounded-full bg-gray-400 dark:bg-gray-600" />
-                          <span className="text-sm text-muted-foreground">
-                            {project.pendingTasks}
-                          </span>
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Pending Tasks</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <div className="flex items-center gap-1 cursor-help">
-                          <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                          <span className="text-sm text-muted-foreground">
-                            {project.onHoldTasks}
-                          </span>
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>On Hold Tasks</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       </ScrollArea>
     </div>

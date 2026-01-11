@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { Client } from "@/utils/dto/client";
+import { Lead } from "@/utils/dto/lead";
 import { RowData } from "@tanstack/react-table";
 
 declare module "@tanstack/react-table" {
@@ -22,7 +22,7 @@ declare module "@tanstack/react-table" {
   }
 }
 
-export const columns: ColumnDef<Client>[] = [
+export const columns: ColumnDef<Lead>[] = [
   {
     accessorKey: "title",
     header: ({ column }) => {

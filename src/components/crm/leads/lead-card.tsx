@@ -1,4 +1,4 @@
-import { Lead } from "./lead-columns";
+import { Lead } from "@/utils/dto/lead";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -58,7 +58,7 @@ export function LeadCard({ lead, onEdit, onDelete, onConvert }: LeadCardProps) {
         <div className="flex items-center gap-2 mt-2">
           <span className="text-xs text-muted-foreground">Contacts:</span>
           <div className="flex -space-x-2">
-            {lead.contacts.slice(0, 3).map((c) => (
+            {lead.contacts?.slice(0, 3).map((c) => (
               <Avatar
                 key={c.contact.id}
                 className="h-6 w-6 border-2 border-background"
