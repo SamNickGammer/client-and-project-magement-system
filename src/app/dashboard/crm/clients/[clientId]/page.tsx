@@ -311,7 +311,11 @@ export default function ClientDetailsPage({ params }: ClientDetailsProps) {
               </TabsContent>
 
               <TabsContent value="attachments" className="pt-6">
-                <LeadAttachmentsTab leadId={clientId} />
+                <LeadAttachmentsTab
+                  leadId={clientId}
+                  attachments={client.attachments}
+                  onRefresh={fetchClient}
+                />
               </TabsContent>
             </Tabs>
           </div>

@@ -25,6 +25,7 @@ export async function GET(
             assignments: { include: { employee: true } },
           },
         },
+        attachments: true,
       },
     });
 

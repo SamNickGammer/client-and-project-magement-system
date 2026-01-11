@@ -261,7 +261,11 @@ export default function LeadDetailsPage() {
               </TabsContent>
 
               <TabsContent value="attachments" className="pt-6">
-                <LeadAttachmentsTab leadId={leadId} />
+                <LeadAttachmentsTab
+                  leadId={leadId}
+                  attachments={lead.attachments}
+                  onRefresh={fetchLead}
+                />
               </TabsContent>
             </Tabs>
           </div>
