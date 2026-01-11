@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { useEffect, useState, use, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -32,24 +32,25 @@ export default function ClientDetailsPage({ params }: ClientDetailsProps) {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [titleContent, setTitleContent] = useState("");
 
-  useEffect(() => {
-    const fetchClient = async () => {
-      try {
-        const res = await fetch(`/api/clients/${clientId}`);
-        if (!res.ok) throw new Error("Failed to fetch client");
-        const data = await res.json();
-        setClient(data);
-        setDescContent(data.description || "");
-        setTitleContent(data.title || "");
-      } catch (error) {
-        console.error(error);
-        toast.error("Failed to load client details");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchClient();
+  const fetchClient = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/clients/${clientId}`);
+      if (!res.ok) throw new Error("Failed to fetch client");
+      const data = await res.json();
+      setClient(data);
+      setDescContent(data.description || "");
+      setTitleContent(data.title || "");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to load client details");
+    } finally {
+      setIsLoading(false);
+    }
   }, [clientId]);
+
+  useEffect(() => {
+    fetchClient();
+  }, [fetchClient]);
 
   const handleUpdate = async (field: Partial<Lead>) => {
     try {
@@ -301,6 +302,7 @@ export default function ClientDetailsPage({ params }: ClientDetailsProps) {
                 <ClientProjectsTab
                   leadId={clientId}
                   projects={client.projects}
+                  onRefresh={fetchClient}
                 />
               </TabsContent>
 

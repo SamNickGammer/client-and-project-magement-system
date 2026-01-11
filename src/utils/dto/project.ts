@@ -8,5 +8,14 @@ export interface Project {
   status: string | null;
   createdAt: string;
   updatedAt: string;
-  clientId: string;
+  leadId: string;
+}
+
+export interface CreateProjectDTO {
+  title: string;
+  description?: string;
+  startDate?: string;
+  endDate?: string;
+  status?: string;
+  leadId: string;
 }
