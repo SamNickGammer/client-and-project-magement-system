@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -24,19 +24,28 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { Lead } from "@/utils/dto/lead";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
   startDate: z.string().optional(),
   endDate: z.string().optional(),
+  leadId: z.string().min(1, "Client is required"),
 });
 
 interface CreateProjectDialogProps {
-  leadId: string;
+  leadId?: string;
   onProjectCreated?: () => void;
 }
 
@@ -46,6 +55,7 @@ export function CreateProjectDialog({
 }: CreateProjectDialogProps) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
+  const [clients, setClients] = useState<Lead[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -54,8 +64,32 @@ export function CreateProjectDialog({
       description: "",
       startDate: "",
       endDate: "",
+      leadId: leadId || "",
     },
   });
+
+  useEffect(() => {
+    if (!leadId && open) {
+      const fetchClients = async () => {
+        try {
+          const res = await fetch("/api/clients");
+          if (res.ok) {
+            const data = await res.json();
+            setClients(data);
+          }
+        } catch (error) {
+          console.error("Failed to fetch clients", error);
+        }
+      };
+      fetchClients();
+    }
+  }, [leadId, open]);
+
+  useEffect(() => {
+    if (leadId) {
+      form.setValue("leadId", leadId);
+    }
+  }, [leadId, form]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
@@ -64,8 +98,7 @@ export function CreateProjectDialog({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...values,
-          leadId,
-          status: "Active", // Default status
+          status: "Active",
         }),
       });
 
@@ -74,7 +107,7 @@ export function CreateProjectDialog({
       toast.success("Project created successfully");
       setOpen(false);
       form.reset();
-      router.refresh(); // Refresh server components
+      router.refresh();
       if (onProjectCreated) onProjectCreated();
     } catch (error) {
       console.error(error);
@@ -93,11 +126,42 @@ export function CreateProjectDialog({
         <DialogHeader>
           <DialogTitle>Create New Project</DialogTitle>
           <DialogDescription>
-            Add a new project for this client.
+            {leadId
+              ? "Add a new project for this client."
+              : "Create a new project and assign it to a client."}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {!leadId && (
+              <FormField
+                control={form.control}
+                name="leadId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Client</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a client" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {clients.map((client) => (
+                          <SelectItem key={client.id} value={client.id}>
+                            {client.title}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
             <FormField
               control={form.control}
               name="title"

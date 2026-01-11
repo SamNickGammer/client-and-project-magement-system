@@ -1,3 +1,5 @@
+import { Task } from "./task";
+
 export interface Project {
   id: string;
   title: string;
@@ -9,6 +11,8 @@ export interface Project {
   createdAt: string;
   updatedAt: string;
   leadId: string;
+  lead?: { id: string; title: string; company?: string | null };
+  tasks?: Task[];
 }
 
 export interface CreateProjectDTO {
