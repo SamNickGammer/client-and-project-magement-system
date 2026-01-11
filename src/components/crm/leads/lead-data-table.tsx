@@ -54,7 +54,7 @@ export function LeadDataTable<TData, TValue>({
   // Memoize data ref to allow internal filtering
   const tableData = React.useMemo(() => {
     if (!showActiveOnly) return data;
-    return data.filter((item) => (item as Lead).status !== "CONVERTED");
+    return data.filter((item) => (item as Lead).status !== "CLIENT");
   }, [data, showActiveOnly]);
 
   // eslint-disable-next-line react-hooks/incompatible-library
@@ -92,7 +92,7 @@ export function LeadDataTable<TData, TValue>({
           variant={showActiveOnly ? "default" : "outline"}
           onClick={() => setShowActiveOnly(!showActiveOnly)}
         >
-          {showActiveOnly ? "Show All" : "Hide Converted"}
+          {showActiveOnly ? "Show All" : "Hide Client"}
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

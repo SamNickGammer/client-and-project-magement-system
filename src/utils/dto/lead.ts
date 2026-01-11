@@ -38,8 +38,9 @@ export interface Lead {
   id: string;
   title: string;
   description: string | null;
-  status: "NEW" | "CONTACTED" | "QUALIFIED" | "CONVERTED" | "LOST";
+  status: "NEW" | "CONTACTED" | "QUALIFIED" | "CONVERTED" | "LOST" | "CLIENT";
   value: number | null;
+  company: string | null;
   createdAt: string;
   updatedAt: string;
   assignedToId: string | null;
@@ -53,6 +54,7 @@ export interface Lead {
     image: string | null;
   } | null;
   contacts?: {
+    contactId: string;
     contact: {
       id: string;
       name: string;
@@ -61,9 +63,9 @@ export interface Lead {
       position: string | null;
     };
   }[];
-  client?: {
+  projects?: {
     id: string;
-    name: string;
-    company: string | null;
-  } | null;
+    title: string;
+    status: string | null;
+  }[];
 }

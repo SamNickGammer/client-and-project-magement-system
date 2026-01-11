@@ -3,14 +3,15 @@ import { prisma } from "@/utils/prisma";
 import { z } from "zod";
 
 const clientSchema = z.object({
-  name: z.string().min(1, "Name is required"),
+  title: z.string().min(1, "Title is required"),
   company: z.string().optional(),
   status: z.string().optional(),
 });
 
 export async function GET() {
   try {
-    const clients = await prisma.client.findMany({
+    const clients = await prisma.lead.findMany({
+      where: { status: { in: ["CLIENT", "CONVERTED"] } },
       orderBy: { createdAt: "desc" },
       include: {
         contacts: { include: { contact: true } },
@@ -39,8 +40,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const newClient = await prisma.client.create({
-      data: result.data,
+    const newClient = await prisma.lead.create({
+      data: {
+        title: result.data.title,
+        company: result.data.company,
+        status: "CLIENT",
+      },
     });
 
     return NextResponse.json(newClient, { status: 201 });

@@ -67,7 +67,10 @@ export async function POST(
     });
 
     if (!currentUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Session invalid. Please log out and log in again." },
+        { status: 401 },
+      );
     }
 
     const body = await req.json();

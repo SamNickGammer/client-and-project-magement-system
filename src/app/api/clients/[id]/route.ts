@@ -3,7 +3,7 @@ import { prisma } from "@/utils/prisma";
 import { z } from "zod";
 
 const clientSchema = z.object({
-  name: z.string().min(1, "Name is required"),
+  title: z.string().min(1, "Title is required"),
   company: z.string().optional(),
   status: z.string().optional(),
 });
@@ -14,7 +14,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const client = await prisma.client.findUnique({
+    const client = await prisma.lead.findUnique({
       where: { id },
       include: {
         contacts: { include: { contact: true } },
@@ -52,9 +52,13 @@ export async function PUT(
       );
     }
 
-    const updatedClient = await prisma.client.update({
+    const updatedClient = await prisma.lead.update({
       where: { id },
-      data: result.data,
+      data: {
+        title: result.data.title,
+        company: result.data.company,
+        status: result.data.status as any, // Cast status if needed or ensure validation matches
+      },
     });
 
     return NextResponse.json(updatedClient);
@@ -73,7 +77,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    await prisma.client.delete({
+    await prisma.lead.delete({
       where: { id },
     });
 

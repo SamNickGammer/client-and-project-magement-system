@@ -8,4 +8,10 @@ export interface Client {
   createdAt: string;
   updatedAt: string;
   projects?: Project[];
+  chatHistory?: any;
+  tags?: string[];
+  description?: string | null;
+  value?: number | null;
+  contacts?: any[];
+  assignedTo?: any;
 }

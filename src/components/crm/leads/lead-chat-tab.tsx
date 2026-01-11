@@ -15,6 +15,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Badge } from "@/components/ui/badge";
 
 interface CommentItemProps {
   comment: ChatComment;
@@ -40,6 +41,19 @@ const CommentItem = ({
   loading,
 }: CommentItemProps) => {
   const isReplying = replyingTo === comment.id;
+
+  // System Message (Divider)
+  if (comment.author.id === "system") {
+    return (
+      <div className="relative flex py-5 items-center">
+        <div className="grow border-t border-muted-foreground/30"></div>
+        <span className="shrink-0 mx-4 text-xs font-semibold uppercase text-muted-foreground bg-muted/50 px-3 py-1 rounded-full border border-muted-foreground/20">
+          {comment.content}
+        </span>
+        <div className="grow border-t border-muted-foreground/30"></div>
+      </div>
+    );
+  }
 
   return (
     <div className={`flex gap-3 mt-4 ${nestLevel > 0 ? "ml-8" : ""}`}>
@@ -157,10 +171,17 @@ const CommentItem = ({
 
 interface LeadChatTabProps {
   initialComments: ChatComment[];
-  leadId: string;
+  // If leadId is provided, it uses /api/leads/[leadId]/chat
+  // If apiEndpoint is provided, it uses that instead
+  leadId?: string;
+  apiEndpoint?: string;
 }
 
-export function LeadChatTab({ initialComments, leadId }: LeadChatTabProps) {
+export function LeadChatTab({
+  initialComments,
+  leadId,
+  apiEndpoint,
+}: LeadChatTabProps) {
   const [comments, setComments] = useState<ChatComment[]>(initialComments);
   const [newComment, setNewComment] = useState("");
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
@@ -176,11 +197,18 @@ export function LeadChatTab({ initialComments, leadId }: LeadChatTabProps) {
     }
   }, [comments]);
 
+  // Determine the API URL
+  const apiUrl = apiEndpoint || (leadId ? `/api/leads/${leadId}/chat` : "");
+
   // Common wrapper to call the chat API
   const mutateChat = async (payload: ChatMutationPayload) => {
+    if (!apiUrl) {
+      toast.error("Chat API not configured");
+      return false;
+    }
     setLoading(true);
     try {
-      const res = await fetch(`/api/leads/${leadId}/chat`, {
+      const res = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -284,31 +312,5 @@ export function LeadChatTab({ initialComments, leadId }: LeadChatTabProps) {
         </div>
       </div>
     </div>
-  );
-}
-
-// Simple Badge component to avoid import circle if UI lib isn't perfectly set up
-function Badge({
-  children,
-  variant,
-  className,
-  onClick,
-}: {
-  children: React.ReactNode;
-  variant?: string;
-  className?: string;
-  onClick?: () => void;
-}) {
-  return (
-    <span
-      onClick={onClick}
-      className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${
-        variant === "secondary"
-          ? "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80"
-          : "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
-      } ${className}`}
-    >
-      {children}
-    </span>
   );
 }

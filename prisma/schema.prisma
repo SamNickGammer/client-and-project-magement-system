@@ -27,6 +27,7 @@ enum LeadStatus {
   QUALIFIED
   CONVERTED
   LOST
+  CLIENT
 }
 
 enum TaskStatus {
@@ -82,7 +83,6 @@ model Contact {
 
   // Many-to-many
   leads       LeadContact[]
-  clients     ClientContact[]
 }
 
 model Lead {
@@ -91,6 +91,7 @@ model Lead {
   description String?
   status      LeadStatus @default(NEW)
   value       Float?
+  company     String?
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
@@ -98,7 +99,7 @@ model Lead {
   assignedTo   Employee? @relation(fields: [assignedToId], references: [id])
   assignedToId String?
   contacts     LeadContact[]
-  client       Client?
+  projects     Project[] // Added back relation
   
   // New fields
   tags         String[]
@@ -131,21 +132,6 @@ model ChecklistItem {
   checklist   LeadChecklist @relation(fields: [checklistId], references: [id])
 }
 
-model Client {
-  id          String    @id @default(uuid())
-  name        String
-  company     String?
-  status      String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  // Relationships
-  leadId      String?   @unique
-  lead        Lead?     @relation(fields: [leadId], references: [id])
-  contacts    ClientContact[]
-  projects    Project[]
-}
-
 model Project {
   id          String    @id @default(uuid())
   title       String
@@ -158,8 +144,8 @@ model Project {
   updatedAt   DateTime  @updatedAt
 
   // Relationships
-  client      Client    @relation(fields: [clientId], references: [id])
-  clientId    String
+  lead        Lead?     @relation(fields: [leadId], references: [id]) // Changed from Client
+  leadId      String?    // Changed from clientId
   tasks       Task[]
   assignments ProjectAssignment[]
 }
@@ -189,16 +175,6 @@ model LeadContact {
   contact    Contact  @relation(fields: [contactId], references: [id])
 
   @@id([leadId, contactId])
-}
-
-model ClientContact {
-  clientId   String
-  contactId  String
-
-  client     Client   @relation(fields: [clientId], references: [id])
-  contact    Contact  @relation(fields: [contactId], references: [id])
-
-  @@id([clientId, contactId])
 }
 
 model ProjectAssignment {

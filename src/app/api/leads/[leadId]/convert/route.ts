@@ -14,53 +14,45 @@ export async function POST(
       include: { contacts: true },
     });
 
+    // Check if lead exists
     if (!lead) {
       return NextResponse.json({ error: "Lead not found" }, { status: 404 });
     }
 
-    if (lead.status === "CONVERTED") {
+    if (lead.status === "CLIENT") {
       return NextResponse.json(
-        { error: "Lead is already converted" },
+        { error: "Lead is already a client" },
         { status: 400 },
       );
     }
 
-    // Transaction: Update Lead -> Create Client -> Copy Contacts
-    const client = await prisma.$transaction(async (tx) => {
-      // 1. Update Lead Status
-      await tx.lead.update({
-        where: { id: leadId },
-        data: { status: "CONVERTED" },
-      });
-
-      // 2. Create Client
-      const newClient = await tx.client.create({
-        data: {
-          name: lead.title, // or use specific logic if lead title isn't suitable
-          // copy value? company? - Currently Client schema has limited fields, basic copy
-          status: "Active",
-          leadId: leadId,
-        },
-      });
-
-      // 3. Copy Contacts: Create ClientContact relations for all existing LeadContacts
-      if (lead.contacts.length > 0) {
-        await tx.clientContact.createMany({
-          data: lead.contacts.map((lc) => ({
-            clientId: newClient.id,
-            contactId: lc.contactId,
-          })),
-        });
-      }
-
-      return newClient;
+    // Update Lead Status to CLIENT
+    const updatedLead = await prisma.lead.update({
+      where: { id: leadId },
+      data: {
+        status: "CLIENT",
+        // Add chat divider for conversion event
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        chatHistory: [
+          {
+            id: `system-convert-${Date.now()}`,
+            type: "system",
+            content: "Lead Converted to Client",
+            createdAt: new Date().toISOString(),
+            author: { id: "system", name: "System", image: null },
+            reactions: [],
+            replies: [],
+          },
+          ...((lead.chatHistory as any[]) || []),
+        ] as any,
+      },
     });
 
-    return NextResponse.json(client);
-  } catch (error) {
+    return NextResponse.json(updatedLead);
+  } catch (error: any) {
     console.error("Error converting lead:", error);
     return NextResponse.json(
-      { error: "Failed to convert lead" },
+      { error: "Failed to convert lead", details: error.message },
       { status: 500 },
     );
   }

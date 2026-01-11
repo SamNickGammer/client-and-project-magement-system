@@ -32,7 +32,7 @@ export async function GET(
             contact: true,
           },
         },
-        client: true,
+
         attachments: true,
       },
     });

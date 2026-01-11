@@ -24,7 +24,7 @@ declare module "@tanstack/react-table" {
 
 export const columns: ColumnDef<Client>[] = [
   {
-    accessorKey: "name",
+    accessorKey: "title",
     header: ({ column }) => {
       return (
         <Button

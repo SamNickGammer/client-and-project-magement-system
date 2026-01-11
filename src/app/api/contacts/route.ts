@@ -22,11 +22,6 @@ export async function GET() {
             lead: true,
           },
         },
-        clients: {
-          include: {
-            client: true,
-          },
-        },
       },
     });
     return NextResponse.json(contacts);

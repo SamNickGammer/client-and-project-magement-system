@@ -1,5 +1,3 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,14 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Client } from "@/utils/dto/client";
+import { Lead } from "@/utils/dto/lead";
 import { Contact } from "@/components/crm/contacts/contact-columns";
 import { useEffect, useState } from "react";
 import { MultiSelect, Option } from "@/components/ui/multi-select";
@@ -26,10 +17,8 @@ import { MultiSelect, Option } from "@/components/ui/multi-select";
 interface ClientFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  client?: Client | null;
-  onSubmit: (
-    data: Partial<Client> & { contactIds?: string[] },
-  ) => Promise<void>;
+  client?: Lead | null;
+  onSubmit: (data: Partial<Lead> & { contactIds?: string[] }) => Promise<void>;
 }
 
 export function ClientFormDialog({
@@ -42,9 +31,8 @@ export function ClientFormDialog({
   const [isLoading, setIsLoading] = useState(false);
 
   // Form state
-  const [name, setName] = useState("");
+  const [title, setTitle] = useState("");
   const [company, setCompany] = useState("");
-  const [status, setStatus] = useState<string>("Active");
   const [selectedContactIds, setSelectedContactIds] = useState<string[]>([]);
 
   // Dropdown options
@@ -71,17 +59,13 @@ export function ClientFormDialog({
 
   useEffect(() => {
     if (client) {
-      setName(client.name);
+      setTitle(client.title);
       setCompany(client.company || "");
-      setStatus(client.status || "Active");
-      // Note: Assuming we might fetch contacts for the client differently or they are included
-      // For now, we'll start with empty or provided contacts if any
-      setSelectedContactIds([]); // TODO: Add logic if client object has contact IDs
+      setSelectedContactIds([]); // TODO: Pre-select contacts if available
     } else {
       // Reset
-      setName("");
+      setTitle("");
       setCompany("");
-      setStatus("Active");
       setSelectedContactIds([]);
     }
   }, [client, open]);
@@ -91,11 +75,10 @@ export function ClientFormDialog({
     setIsLoading(true);
     try {
       await onSubmit({
-        name,
+        title,
         company,
-        status,
         contactIds: selectedContactIds,
-      });
+      } as any);
       onOpenChange(false);
     } catch (error) {
       console.error(error);
@@ -119,13 +102,13 @@ export function ClientFormDialog({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
+            <Label htmlFor="title" className="text-right">
               Name
             </Label>
             <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
               className="col-span-3"
               required
             />
@@ -141,22 +124,6 @@ export function ClientFormDialog({
               onChange={(e) => setCompany(e.target.value)}
               className="col-span-3"
             />
-          </div>
-
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="status" className="text-right">
-              Status
-            </Label>
-            <Select value={status} onValueChange={setStatus}>
-              <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Active">Active</SelectItem>
-                <SelectItem value="Inactive">Inactive</SelectItem>
-                <SelectItem value="Hold">Hold</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
 
           <div className="grid grid-cols-4 items-center gap-4">
