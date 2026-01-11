@@ -61,7 +61,9 @@ export function ClientFormDialog({
     if (client) {
       setTitle(client.title);
       setCompany(client.company || "");
-      setSelectedContactIds([]); // TODO: Pre-select contacts if available
+      setSelectedContactIds(
+        client.contacts?.map((c: any) => c.contactId) || [],
+      );
     } else {
       // Reset
       setTitle("");

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -36,6 +37,14 @@ export const columns: ColumnDef<Lead>[] = [
         </Button>
       );
     },
+    cell: ({ row }) => (
+      <Link
+        href={`/dashboard/crm/clients/${row.original.id}`}
+        className="font-medium hover:underline text-primary"
+      >
+        {row.getValue("title")}
+      </Link>
+    ),
   },
   {
     accessorKey: "company",

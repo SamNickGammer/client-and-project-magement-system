@@ -46,28 +46,24 @@ export default function ClientsPage() {
     try {
       if (editingClient) {
         // Edit logic
-        /*
         const res = await fetch(`/api/clients/${editingClient.id}`, {
-          method: "PATCH",
+          method: "PUT",
           body: JSON.stringify(data),
         });
         if (!res.ok) throw new Error("Failed to update");
-        */
-        toast.info("Update logic not implemented yet (Mock)");
+        toast.success("Client updated successfully");
       } else {
         // Create logic
-        /*
         const res = await fetch("/api/clients", {
           method: "POST",
-          body: JSON.stringify(data),
+          body: JSON.stringify({ ...data, status: "CLIENT" }),
         });
         if (!res.ok) throw new Error("Failed to create");
-        */
-        toast.info("Create logic not implemented yet (Mock)");
+        toast.success("Client created successfully");
       }
 
       // Refresh list
-      // await fetchClients();
+      await fetchClients();
       setIsDialogOpen(false);
     } catch (error) {
       toast.error("Operation failed");
@@ -82,7 +78,7 @@ export default function ClientsPage() {
   // We need to pass meta to the DataTable.
 
   return (
-    <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+    <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 px-64">
       <div className="flex items-center justify-between px-4 lg:px-6">
         <h1 className="text-2xl font-bold tracking-tight">Clients</h1>
       </div>

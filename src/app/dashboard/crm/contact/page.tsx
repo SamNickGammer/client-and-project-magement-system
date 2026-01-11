@@ -108,7 +108,7 @@ export default function ContactsPage() {
   });
 
   return (
-    <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 relative">
+    <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 relative px-64">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 lg:px-6">
         <h1 className="text-2xl font-bold tracking-tight">Contacts</h1>
         <div className="flex items-center gap-2">
